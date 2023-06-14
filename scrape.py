@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import pandas as pd
 import time
-os.environ["PATH"]+='/home/niranjan/Downloads/chromedriver'
+os.environ["PATH"]+='projectyoutube/chromedriver'
 chrome_options = Options()
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--headless')
