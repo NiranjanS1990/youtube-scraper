@@ -14,10 +14,4 @@ st.text_input("Enter Channel Name",key="scrape_data")
 channel= st.session_state["scrape_data"]
 df = scrape.youtube_videos_dataframe(channel)
 st.download_button(label="DOWNLOAD!",data=df.to_csv().encode('utf-8'),file_name=f"{channel}.csv",mime="csv/plain")
-'''with st.form("Channel statistics"):
-    st.text_input("Enter Channel Name",key="scrape_data")
-    submitted = st.form_submit_button("submit")
-    if submitted:
-        channel= st.session_state["scrape_data"]
-        df = scrape.youtube_videos_dataframe(channel)
-        st.download_button(label="DOWNLOAD!",data=df.to_csv(),file_name="string.txt",mime="text/plain")'''
+
