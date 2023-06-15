@@ -5,29 +5,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import pandas as pd
 import time
-os.environ["PATH"]+='projectyoutube/chromedriver'
-chrome_options = Options()
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Chrome(options=chrome_options)
-def youtube_videos_dataframe(search):
-    driver.get(f"https://www.youtube.com/@{search}/videos")
-    #driver.implicitly_wait(3)
-    WAIT_IN_SECONDS = 2
-    last_height = driver.execute_script("return document.documentElement.scrollHeight")
-
-    while True:
-        # Scroll to the bottom of page
-        driver.execute_script("window.scrollTo(0, arguments[0]);", last_height)
-        # Wait for new videos to show up
-        time.sleep(WAIT_IN_SECONDS)
-        
-        # Calculate new document height and compare it with last height
-        new_height = driver.execute_script("return document.documentElement.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height = new_height
+# setting up selenium driver for webscrapping
+def get_driver():
+    os.environ["PATH"]+='projectyoutube/chromedriver'
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(options=chrome_options)
+    return driver
+# scrapping youtube channel/video page for description,video links, views, video length, uploaded period.
+def scrape_videos(driver):
     videos=driver.find_elements(By.XPATH, "//a[@id='video-title-link'][@class='yt-simple-endpoint focus-on-expand style-scope ytd-rich-grid-media']")
     uploaded_video_details={}
     uploaded_video_details["description"]=[]
@@ -47,6 +35,34 @@ def youtube_videos_dataframe(search):
         uploaded_video_details["video_length"].append(video_length)
     df=pd.DataFrame.from_dict(uploaded_video_details)
     return df
+# Scrolling Youtube video page to complete bottom to scrape all video
+def scroll_page_down(driver):
+    WAIT_IN_SECONDS = 2
+    #scrolling the  webpage to bottom 
+    last_height = driver.execute_script("return document.documentElement.scrollHeight")
+    while True:
+        # Scroll to the bottom of page
+        driver.execute_script("window.scrollTo(0, arguments[0]);", last_height)
+        # Wait for new videos to show up
+        time.sleep(WAIT_IN_SECONDS)
+        
+        # Calculate new document height and compare it with last height
+        new_height = driver.execute_script("return document.documentElement.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+    return driver
+# Scrapping Any YouTube Channel page
+def youtube_videos_dataframe(search):
+    driver=get_driver()
+    driver.get(f"https://www.youtube.com/@{search}/videos")
+    driver=scroll_page_down(driver)
+    df= scrape_videos(driver)
+    return df
+
+
+
+
 
 
 
